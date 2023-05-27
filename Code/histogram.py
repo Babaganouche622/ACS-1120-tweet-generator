@@ -1,6 +1,7 @@
 import string
 import sys
 import os
+import random
 
 total_words = ""
 
@@ -34,23 +35,36 @@ def frequency(word, histogram):
     # Get the frequency of the given word from the histogram
     return histogram.get(word, 0)
 
-# Example usage
-source_text = """
-In this tutorial, we\’ll be writing a program which, given a source body of text, can perform operations to answer questions such as:
+def generate_random_word(word_list):
+    # Set the keys and weights
+    keys = list(word_list.keys())
+    weights = list(word_list.values())
 
-What is the least/most frequent word(s)?
-How many different words are used?
-What is the average (mean/median/mode) frequency of words in the text?
-The structure to represent this kind of data is called a histogram, which really just means a count of things by category. In Python, you can represent a histogram in a variety of ways using the different data structures available. Part of the challenge of this tutorial is how to design and use these data structures to create a histogram.
-"""  # Replace with the path to your source text file or provide the contents as a string
+    # Grab a random key based on the frequency of occurence
+    word = random.choices(keys, weights=weights)[0]
+    
+    return word
+
+
+# Example usage
+source_text = "one fish two fish red fish blue fish"
 
 dracula_file = "./data/dracula.txt"
 
+# Which file or sample text are be using?
 hist = histogram(dracula_file)
 # hist = histogram(source_text)
+
+# Count the unique words from the histogram
 unique_count = unique_words(hist)
+
+# Count the frequency of a given word
 mystery_count = frequency(sys.argv[1], hist)
+
+# Grab a random word based off a weighted system
+random_word = generate_random_word(hist)
 
 print("Total unique words:", unique_count)
 print("Total words:", len(total_words))
 print(f"Frequency of '{sys.argv[1]}':", mystery_count)
+print(f"Random word: {random_word}")
