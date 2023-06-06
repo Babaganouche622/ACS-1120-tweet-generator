@@ -1,21 +1,19 @@
 """Main script, uses other modules to generate sentences."""
 from flask import Flask
 import random
-from dictionary_words import generate_random_quote
+from histogram_oop import Histogram
 
 
 app = Flask(__name__)
 
 # TODO: Initialize your histogram, hash table, or markov chain here.
 # Any code placed here will run only once, when the server starts.
-def random_words():
-    random_number = random.randint(1, 100)
-    return generate_random_quote(random_number)
+hist = Histogram("./data/dracula.txt")
 
 @app.route("/")
 def home():
     """Route that returns a web page containing the generated text."""
-    return f"<p>{random_words()}</p>"
+    return f"<p>{hist.get_random_phrase()}</p>"
 
 
 if __name__ == "__main__":

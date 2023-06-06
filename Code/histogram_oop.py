@@ -2,6 +2,7 @@ import string
 import sys
 import os
 import random
+import itertools
 
 class Histogram:
     def __init__(self, source_text):
@@ -80,6 +81,17 @@ class Histogram:
         # Generate a list of tuples containing unique words and their frequencies
         return list(self.hist.items())
 
+    def generate_random_phrase(self):
+
+        random_words = []
+        for _ in range(random.randint(1, 20)):
+            random_words.append(self.generate_random_word().strip())
+        phrase = " ".join(random_words)
+        phrase = phrase.capitalize() + "."
+        return phrase
+
+    def get_random_phrase(self):
+        return self.generate_random_phrase()
 
 
 def collect_data(source_text, num_runs, word):
@@ -101,23 +113,28 @@ def collect_data(source_text, num_runs, word):
 
 
 # Setup
-source_text = "one fish two fish red fish blue fish"
+fish_file = "./data/fish.txt"
 dracula_file = "./data/dracula.txt"
-num_runs = int(sys.argv[2])
+# num_runs = int(sys.argv[2])
+# sys_argv_file = f"./data/{sys.argv[1]}.txt"
 
 # Call the collect_data method to collect the desired information
-unique_count, total_words, mystery_count, random_word_histogram = collect_data(source_text, num_runs, sys.argv[1])
+# unique_count, total_words, mystery_count, random_word_histogram = collect_data(sys_argv_file, num_runs, sys.argv[1])
 
 # Print the final results
-print(f"""
-This is the setup:
-Total unique words: {unique_count}
-Total words: {total_words}
-Frequency of '{sys.argv[1]}': {mystery_count}
-Data Collection method was run {sys.argv[2]} times
-""")
+# print(f"""
+# This is the setup:
+# Total unique words: {unique_count}
+# Total words: {total_words}
+# Frequency of '{sys.argv[1]}': {mystery_count}
+# Data Collection method was run {sys.argv[2]} times
+# """)
 
 # Print the list of word frequencies
-print("List of random words and frequency they were selected in the data collection:")
-for word, frequency in random_word_histogram:
-    print(f"{word}: {frequency}")
+# print("List of random words and frequency they were selected in the data collection:")
+# for word, frequency in itertools.islice(random_word_histogram, 10):
+#     print(f"{word}: {frequency}")
+if __name__ == "__main__":
+    hist = Histogram(dracula_file)
+    for _ in range(random.randint(1, 5)):
+        print(hist.get_random_phrase())
