@@ -94,22 +94,22 @@ class Histogram:
         return self.generate_random_phrase()
 
 
-def collect_data(source_text, num_runs, word):
-    # Create an instance of the Histogram class
-    histogram = Histogram(source_text)
+# def collect_data(source_text, num_runs, word):
+#     # Create an instance of the Histogram class
+#     histogram = Histogram(source_text)
 
-    unique_count = 0
-    mystery_count = 0
-    random_words = []
+#     unique_count = 0
+#     mystery_count = 0
+#     random_words = []
 
-    for _ in range(num_runs):
-        # Call the methods to get the desired values
-        unique_count += histogram.get_total_unique_words()
-        mystery_count += histogram.get_frequency(word)
-        random_words.append(histogram.get_random_word())
+#     for _ in range(num_runs):
+#         # Call the methods to get the desired values
+#         unique_count += histogram.get_total_unique_words()
+#         mystery_count += histogram.get_frequency(word)
+#         random_words.append(histogram.get_random_word())
 
-    random_word_histogram = sorted(Histogram(random_words).get_word_frequencies(), key=lambda x: x[1], reverse=True)
-    return unique_count, histogram.get_total_words(), mystery_count, random_word_histogram
+#     random_word_histogram = sorted(Histogram(random_words).get_word_frequencies(), key=lambda x: x[1], reverse=True)
+#     return unique_count, histogram.get_total_words(), mystery_count, random_word_histogram
 
 
 # Setup
