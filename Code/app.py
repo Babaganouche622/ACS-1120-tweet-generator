@@ -13,7 +13,7 @@ hist = Histogram("./data/dracula.txt")
 @app.route("/")
 def home():
     """Route that returns a web page containing the generated text."""
-    phrase = hist.get_random_phrase()
+    phrase = hist.get_random_phrase("markov")
     return render_template("index.html", phrase=phrase)
 
 
