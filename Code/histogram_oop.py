@@ -2,14 +2,12 @@ import string
 import sys
 import os
 import random
-import itertools
 
 class Histogram:
     def __init__(self, source_text):
         self.total_words = set()
         self.hist = self._generate_histogram(source_text)
         self.chain = self._build_markov_chain(source_text)
-
 
     def _preprocess_text(self, source_text):
         # Read the source text file or use the contents directly if provided as a string
@@ -114,8 +112,11 @@ class Histogram:
         elif which == "markov":
             random_words = []
             current_word = random.choice(list(self.chain.keys()))
-
-            for _ in range(random.randint(1, 20)):
+            # for dracula in list(self.chain.keys()):
+            #     if dracula == "Dracula":
+            #         random_words.append(dracula)
+            #         break
+            for _ in range(random.randint(1, 30)):
                 random_words.append(current_word)
                 next_word_options = self.chain.get(current_word, [])
                 if next_word_options:
@@ -124,10 +125,56 @@ class Histogram:
                     break
 
             phrase = " ".join(random_words)
-            phrase = phrase.capitalize() + "."
+            phrase = phrase.capitalize() + '.'
+            for char in string.punctuation:
+                if char in phrase[len(phrase) - 2]:
+                    phrase = phrase[:len(phrase) - 2] + phrase[len(phrase) - 1]
+            phrase = self.apply_punctuation_changes(phrase)
             return phrase
         else:
-            return "Did not recieve a choice."
+            return "Did not receive a choice."
+
+    def apply_punctuation_changes(self, phrase):
+        # List of punctuation marks to consider
+        punctuation_marks = string.punctuation
+
+        # Iterate over the phrase and make necessary changes
+        words = phrase.split()
+        for i in range(len(words)):
+            word = words[i]
+
+            if '"' in word and "'" in word:
+                # Remove both single quotes and double quotes
+                word = word.replace("'", "").replace('"', "")
+            elif "'" in word:
+                # Remove single quotes
+                word = word.replace("'", "")
+            elif '"' in word:
+                # Remove double quotes
+                word = word.replace('"', "")
+
+            words[i] = word
+
+            if word == "i":
+                words[i] = word.capitalize()
+
+            if len(word) > 1 and word[-1] in punctuation_marks:
+                # Separate the word from the trailing punctuation mark
+                punctuation = word[-1]
+                word = word[:-1]  # Remove the last character (punctuation mark) from the word
+
+                # Apply grammar changes based on punctuation type
+                if punctuation == '.' or punctuation == '!' or punctuation == '?':
+                    # Capitalize the first letter of the next word
+                    if i + 1 < len(words):
+                        words[i + 1] = words[i + 1].capitalize()
+
+                # Reassign the modified word with the punctuation mark to the list
+
+                words[i] = word + punctuation
+
+
+        return ' '.join(words)
 
     def get_random_phrase(self, which):
         return self.generate_random_phrase(which)
@@ -176,9 +223,9 @@ dracula_file = "./data/dracula.txt"
 #     print(f"{word}: {frequency}")
 if __name__ == "__main__":
     hist = Histogram(dracula_file)
-    for _ in range(random.randint(1, 5)):
-        print(hist.get_random_phrase("histogram"))
+    # for _ in range(random.randint(1, 5)):
+    #     print(hist.get_random_phrase("histogram"))
 
-    print("\nThis is now the markov chain:")
+    print("\nThis is now the markov chain:\n")
     for _ in range(random.randint(1, 5)):
         print(hist.get_random_phrase("markov"))
