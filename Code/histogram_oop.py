@@ -4,10 +4,11 @@ import os
 import random
 
 class Histogram:
-    def __init__(self, source_text):
+    def __init__(self, source_text, order=1):
         self.total_words = set()
         self.hist = self._generate_histogram(source_text)
-        self.chain = self._build_markov_chain(source_text)
+        self.chain = self._build_markov_chain(source_text, order)
+        self.order = order
 
     def _preprocess_text(self, source_text):
         # Read the source text file or use the contents directly if provided as a string
@@ -28,10 +29,6 @@ class Histogram:
             # Invalid input type, raise an exception or handle it accordingly
             raise ValueError("Invalid source_text type. Expected string or list.")
 
-
-        # Remove punctuation and convert text to lowercase
-        # text = text.translate(str.maketrans('', '', string.punctuation)).lower()
-        
         return text
 
 
@@ -47,18 +44,18 @@ class Histogram:
 
         return histogram
 
-    def _build_markov_chain(self, source_text):
+    def _build_markov_chain(self, source_text, order):
         chain = {}
         words = self._preprocess_text(source_text).split()
 
-        for i in range(len(words) - 1):
-            current_word = words[i]
-            next_word = words[i + 1]
+        for i in range(len(words) - order):
+            current_state = tuple(words[i:i+order])
+            next_word = words[i + order]
 
-            if current_word in chain:
-                chain[current_word].append(next_word)
+            if current_state in chain:
+                chain[current_state].append(next_word)
             else:
-                chain[current_word] = [next_word]
+                chain[current_state] = [next_word]
 
         return chain
 
@@ -101,34 +98,21 @@ class Histogram:
         return list(self.hist.items())
 
     def generate_random_phrase(self, which):
-        if which == "histogram":
+        if which == "markov":
             random_words = []
-            for _ in range(random.randint(1, 20)):
-                random_words.append(self.generate_random_word().strip())
-            phrase = " ".join(random_words)
-            phrase = phrase.capitalize() + "."
-            return phrase
+            current_state = random.choice(list(self.chain.keys()))
 
-        elif which == "markov":
-            random_words = []
-            current_word = random.choice(list(self.chain.keys()))
-            # for dracula in list(self.chain.keys()):
-            #     if dracula == "Dracula":
-            #         random_words.append(dracula)
-            #         break
             for _ in range(random.randint(1, 30)):
-                random_words.append(current_word)
-                next_word_options = self.chain.get(current_word, [])
+                random_words.append(current_state[-1])
+                next_word_options = self.chain.get(current_state, [])
                 if next_word_options:
-                    current_word = random.choice(next_word_options)
+                    next_word = random.choice(next_word_options)
+                    current_state = tuple(list(current_state)[1:] + [next_word])
                 else:
                     break
 
             phrase = " ".join(random_words)
             phrase = phrase.capitalize() + '.'
-            for char in string.punctuation:
-                if char in phrase[len(phrase) - 2]:
-                    phrase = phrase[:len(phrase) - 2] + phrase[len(phrase) - 1]
             phrase = self.apply_punctuation_changes(phrase)
             return phrase
         else:
@@ -181,51 +165,11 @@ class Histogram:
 
 
 
-# def collect_data(source_text, num_runs, word):
-#     # Create an instance of the Histogram class
-#     histogram = Histogram(source_text)
-
-#     unique_count = 0
-#     mystery_count = 0
-#     random_words = []
-
-#     for _ in range(num_runs):
-#         # Call the methods to get the desired values
-#         unique_count += histogram.get_total_unique_words()
-#         mystery_count += histogram.get_frequency(word)
-#         random_words.append(histogram.get_random_word())
-
-#     random_word_histogram = sorted(Histogram(random_words).get_word_frequencies(), key=lambda x: x[1], reverse=True)
-#     return unique_count, histogram.get_total_words(), mystery_count, random_word_histogram
-
-
-# Setup
 fish_file = "./data/fish.txt"
 dracula_file = "./data/dracula.txt"
-# num_runs = int(sys.argv[2])
-# sys_argv_file = f"./data/{sys.argv[1]}.txt"
 
-# Call the collect_data method to collect the desired information
-# unique_count, total_words, mystery_count, random_word_histogram = collect_data(sys_argv_file, num_runs, sys.argv[1])
-
-# Print the final results
-# print(f"""
-# This is the setup:
-# Total unique words: {unique_count}
-# Total words: {total_words}
-# Frequency of '{sys.argv[1]}': {mystery_count}
-# Data Collection method was run {sys.argv[2]} times
-# """)
-
-# Print the list of word frequencies
-# print("List of random words and frequency they were selected in the data collection:")
-# for word, frequency in itertools.islice(random_word_histogram, 10):
-#     print(f"{word}: {frequency}")
 if __name__ == "__main__":
-    hist = Histogram(dracula_file)
-    # for _ in range(random.randint(1, 5)):
-    #     print(hist.get_random_phrase("histogram"))
-
+    hist = Histogram(dracula_file, order=2)
     print("\nThis is now the markov chain:\n")
     for _ in range(random.randint(1, 5)):
         print(hist.get_random_phrase("markov"))
